@@ -16,7 +16,7 @@ module "vpc" {
   enable_dns_hostnames = true
   enable_dns_support   = true
 
-  tags {
+  tags = {
     Enviroment = "dev"
   }
 }
@@ -55,7 +55,7 @@ resource "aws_db_instance" "rds_high_availability" {
   engine_version       = "5.7"
   instance_class       = "db.t3.large"
   username             = "admin"
-  password             = random_password.RDS_password.result
+  password             = random_password.RDS_mighty_password.result
   parameter_group_name = "default.mysql5.7"
   skip_final_snapshot  = true
   multi_az             = true

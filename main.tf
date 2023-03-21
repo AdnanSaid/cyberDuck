@@ -45,3 +45,18 @@ resource "aws_secretsmanager_secret_version" "sversion" {
    }
 EOF
 }
+
+#to create a highly availble rds. we would need a large amount of allocated storage, the instance class is set as large
+#the most important addition is setting the multi_az as true. this is a highly available deployment of Amazon RDS
+#it is available for different engine but most importantly for MySQLs
+resource "aws_db_instance" "rds_high_availability" {
+  allocated_storage    = 100
+  engine               = "mysql"
+  engine_version       = "5.7"
+  instance_class       = "db.t3.large"
+  username             = "admin"
+  password             = random_password.RDS_password.result
+  parameter_group_name = "default.mysql5.7"
+  skip_final_snapshot  = true
+  multi_az             = true
+}

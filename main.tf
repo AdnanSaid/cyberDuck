@@ -21,3 +21,27 @@ module "vpc" {
   }
 }
 
+#create a random password generator so the password isn't stored in the repository 
+#https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password
+
+resource "random_password" "RDS_mighty_password" { 
+  length  = 16
+  special = true
+}
+
+resource "aws_secretsmanager_secret" "RDS_stored_pass" { 
+  name = "RDS_stored_pass"
+}
+
+#once the password is generated it will be stored in the secret manager. This is useful as the random password can be safetly 
+#locked away, in the aws account. 
+
+resource "aws_secretsmanager_secret_version" "sversion" {
+  secret_id     = aws_secretsmanager_secret.RDS_stored_pass.id
+  secret_string = <<EOF
+   {
+    "username": "admin",
+    "password": "${random_password.RDS_mighty_password.result}"
+   }
+EOF
+}

@@ -24,7 +24,7 @@ aws configure
 
 '''
 
-2. 
+2.  
 
 Once I collated my research I first created the VPC, I did this my using a VPC module. The VPC module was then edited to fit a simple use case.
 

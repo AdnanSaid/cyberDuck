@@ -9,15 +9,24 @@ module "vpc" {
   # For VPC peerings, external private connections etc
   # /24 and /27 chosen to have enough space for resources but not too large to overuse IP Address space
 
-  cidr = "10.0.175.0/24"
+  cidr = "10.0.0.0/16"
 
   azs                  = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
-  public_subnets       = ["10.0.101.0/27", "10.0.102.0/27", "10.0.103.0/27"]
+  public_subnets       = ["10.0.101.0/26", "10.0.102.0/26", "10.0.103.0/26"]
   enable_dns_hostnames = true
   enable_dns_support   = true
 
   tags = {
     Enviroment = "dev"
+  }
+}
+
+resource "aws_db_subnet_group" "mighty_subnet_group" {
+  name       = "mighty_subnet_group"
+  subnet_ids = module.vpc.public_subnets
+
+  tags = {
+    Name = "mighty_subnet_group"
   }
 }
 
@@ -41,7 +50,7 @@ resource "aws_secretsmanager_secret_version" "sversion" {
   secret_string = <<EOF
    {
     "username": "admin",
-    "password": "${random_password.RDS_mighty_password.result}"
+    "password": ${random_password.RDS_mighty_password.result}
    }
 EOF
 }
@@ -50,12 +59,14 @@ EOF
 #the most important addition is setting the multi_az as true. this is a highly available deployment of Amazon RDS
 #it is available for different engine but most importantly for MySQLs
 resource "aws_db_instance" "rds_high_availability" {
+  db_name              = "mighty-ducks-rds"
   allocated_storage    = 100
   engine               = "mysql"
   engine_version       = "5.7"
   instance_class       = "db.t3.large"
   username             = "admin"
   password             = random_password.RDS_mighty_password.result
+  db_subnet_group_name = aws_db_subnet_group.mighty_subnet_group.name
   parameter_group_name = "default.mysql5.7"
   skip_final_snapshot  = true
   multi_az             = true

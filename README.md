@@ -19,10 +19,10 @@ I first created the provider, this was set up to use the latest terraform versio
 
 I then set profile of the aws provider to be the default profile on my local machine. To do so Installed the AWS cli I then ran the code below in the command line which allowed me to configure the AWS secret and secret access within the local machine.
 
-'''
+```
 aws configure
 
-'''
+```
 
 2.  
 
@@ -32,3 +32,53 @@ Since I knew the RDS uses a username and password, I then tested a password gene
 
 I then created the RDS, I provided with an allocated storage of 100 and ensured the instance class was set as large over micro. this follows as the RDS needs to be highly available. Finally an optional variable that is used multi-az was set to true to ensure that the rds is Multi-AZ. 
 
+3. 
+
+To test everything was correctly formatted and good enough I wrote the following code.
+
+```
+terraform init 
+
+terraform validate
+
+terraform fmt
+```
+
+'init' initialised the script in regards to the versions I had stated.
+'validate' allowed me to validate the current codebase internally for syntax and inconsistencies
+'fmt' This allowed me to refactor the code to the correct terraform format.
+
+I then realised I forogt to attach the VPC so I wrote up the subnet group resourse and attached it.
+
+To finish I ran terraform validate and fmt one more time.
+
+4. 
+Testing the code worked meant I would need to run it through AWS, I used my free tier account. Once configured I ran the following code to apply what I had used to be built in AWS using the terraform code
+
+```
+terraform plan 
+
+terraform apply 
+
+```
+
+'terraform plan' is used to view how the code would be built, it shows us how everything is will be applied and if any errors exist. 
+
+'terraform apply' this also performs a plan but then asks whether to actually apply the planned changes. when you say yes it goes ahead and begins building. The rds it self took 8 mins to build and successfully so.
+**Another way to apply is to type 'terraform apply -auto-approve this automatically begins applying the resources without the promt useful if you''ve already typed out 'terraform plan'**
+
+Once the plan was complete I checked AWS to see how everything was made then went on to pull it all down.
+
+```
+terraform destroy -auto-approve
+
+```
+
+'destroy' pulls down everything in the current state. 
+
+5. 
+Finally I cleaned everything up by creating a vars.tf and terraform.tfvars. Here I placed all the customizable variables.
+
+I tested everything one last time and finished off the README
+
+<sub>I hope you guys understood this, this was a fun task</sub>

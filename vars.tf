@@ -1,31 +1,13 @@
-variable "vpc_name" {
-  
-}
+variable "vpc_name" {}
 
-variable "subnet_name" {
-  
-}
+variable "subnet_name" {}
 
-variable "secret_name" {
-  
-}
+variable "secret_name" {}
 
-variable "rds_username" {
-  
-}
+variable "rds_username" {}
 
-variable "db_name" {
-  
-}
+variable "engine" {}
 
-variable "engine" {
-  
-}
+variable "engine_version" {}
 
-variable "engine_version" {
-  
-}
-
-variable "instance_class" {
-  
-}
+variable "instance_class" {}

@@ -3,8 +3,7 @@
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
-  name = "mighty-rds-vpc"
-
+  name = var.vpc_name
   # Choose an uncommon IP Address range to make IP address collisions more uncommon in the future
   # For VPC peerings, external private connections etc
   # /24 and /27 chosen to have enough space for resources but not too large to overuse IP Address space
@@ -22,7 +21,7 @@ module "vpc" {
 }
 
 resource "aws_db_subnet_group" "mighty_subnet_group" {
-  name       = "mighty_subnet_group"
+  name       = var.subnet_name
   subnet_ids = module.vpc.public_subnets
 
   tags = {
@@ -39,7 +38,7 @@ resource "random_password" "RDS_mighty_password" {
 }
 
 resource "aws_secretsmanager_secret" "RDS_stored_pass" {
-  name = "RDS_stored_pass"
+  name = var.secret_name
 }
 
 #once the password is generated it will be stored in the secret manager. This is useful as the random password can be safetly 
@@ -49,7 +48,7 @@ resource "aws_secretsmanager_secret_version" "sversion" {
   secret_id     = aws_secretsmanager_secret.RDS_stored_pass.id
   secret_string = <<EOF
    {
-    "username": "admin",
+    "username": "${var.rds_username}",
     "password": ${random_password.RDS_mighty_password.result}
    }
 EOF
@@ -59,12 +58,11 @@ EOF
 #the most important addition is setting the multi_az as true. this is a highly available deployment of Amazon RDS
 #it is available for different engine but most importantly for MySQLs
 resource "aws_db_instance" "rds_high_availability" {
-  db_name              = "mighty-ducks-rds"
   allocated_storage    = 100
-  engine               = "mysql"
-  engine_version       = "5.7"
-  instance_class       = "db.t3.large"
-  username             = "admin"
+  engine               = var.engine
+  engine_version       = var.engine_version
+  instance_class       = var.instance_class
+  username             = var.rds_username
   password             = random_password.RDS_mighty_password.result
   db_subnet_group_name = aws_db_subnet_group.mighty_subnet_group.name
   parameter_group_name = "default.mysql5.7"
